@@ -1,0 +1,60 @@
+<div class="pageHeader">
+	<!-- navTabSearch就是获取pageNum和numPerPage，然后提交 -->
+	<form onsubmit="return navTabSearch(this);" action="v_stat_list.do" method="post">
+	<div class="searchBar">
+		<ul class="searchContent">
+			<li>
+				<label><@s.m "startDate"/>：</label>
+				<input type="text" name="startDate" class="date textInput" size="20" value="${(startDate?string('yyyy-MM-dd'))!}"/><a class="inputDateButton" href="javascript:;">选择</a>
+			</li>
+			<li>
+				<label><@s.m "endDate"/>：</label>
+				<input type="text" name="endDate" class="date textInput" size="20" value="${(endDate?string('yyyy-MM-dd'))!}"/><a class="inputDateButton" href="javascript:;">选择</a>
+			</li>
+		</ul>
+		<div class="subBar">
+			<ul>
+				<li><div class="buttonActive"><div class="buttonContent"><button type="submit"><@s.m "global.query"/></button></div></div></li>
+			</ul>
+		</div>
+	</div>
+	</form>
+</div>
+<div class="pageContent">
+	<table class="list" width="100%" layoutH="85">
+		<thead>
+			<tr>
+				<th width="20"><@s.m "global.id"/></th>
+				<th width="80"><@s.m "material"/></th>
+				<th width="40"><@s.m "purchase.order"/></th>
+				<th width="40"><@s.m "purchaseIn"/></th>
+				<th width="40"><@s.m "purchaseBack"/></th>
+				<th width="40"><@s.m "sell.order"/></th>
+				<th width="40"><@s.m "sellOut"/></th>
+				<th width="40"><@s.m "sellBack"/></th>
+				<th width="40"><@s.m "plan.material"/></th>
+				<th width="40"><@s.m "plan.in"/></th>
+				<th width="40"><@s.m "checkIn"/></th>
+				<th width="40"><@s.m "checkOut"/></th>
+			</tr>
+		</thead>
+		<tbody>
+			<#list materials as material>
+			<tr target="sid_user" rel="1">
+				<td>${material.id}</td>
+				<td>${material.nameSpec}</td>
+				<td>${material.purchaseOrder!}</td>
+				<td>${material.purchaseIn!}</td>
+				<td>${material.purchaseBack!}</td>
+				<td>${material.sellOrder!}</td>
+				<td>${material.sellOut!}</td>
+				<td>${material.sellBack!}</td>
+				<td>${material.planMaterial!}</td>
+				<td>${material.planIn!}</td>
+				<td>${material.checkIn!}</td>
+				<td>${material.checkOut!}</td>
+			</tr>
+			</#list>
+		</tbody>
+	</table>
+</div>

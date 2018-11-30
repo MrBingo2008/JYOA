@@ -1,0 +1,149 @@
+<script type="text/javascript">
+$(function(){
+	var status = '${searchStatus!}';
+	$("#statusSelect").val(status);
+});
+
+function testOpen(){
+	//$.pdialog.close("dialog_purchase_order_todo_list");
+	navTab.openTab("main", "v_purchase_order_add.do",{title:"test", fresh:true, external:true});
+}
+</script>
+<form id="pagerForm" method="post" action="v_${orderType}_order_list.do?type=${type}">
+	<input type="hidden" name="searchName" value="${searchName!}"/>
+	<input type="hidden" name="searchRecordName" value="${searchRecordName!}"/>
+	<input type="hidden" name="searchCompanyName" value="${searchCompanyName!}"/>
+	<input type="hidden" name="searchStatus" value="${searchStatus!}" />
+	<input type="hidden" name="pageNum" value="${pagination.pageNo!}" />
+	<input type="hidden" name="numPerPage" value="${pagination.pageSize!}" />
+</form>
+
+<div class="pageHeader">
+	<!-- navTabSearch就是获取pageNum和numPerPage，然后提交 -->
+	<form onsubmit="return <#if type gt 0>dwzSearch(this, 'dialog');<#else>navTabSearch(this);</#if>" action="v_${orderType}_order_list.do?type=${type}" method="post">
+	<div class="searchBar">
+		<ul class="searchContent">
+			<li>
+				<label><@s.m "bill.serialOrName"/>：</label>
+				<input type="text" name="searchName" value="${searchName!}"/>
+			</li>
+			<li>
+				<label><@s.m "record.serialOrName"/>：</label>
+				<input type="text" name="searchRecordName" value="${searchRecordName!}"/>
+			</li>
+			<li>
+				<label><@s.m "company"/>：</label>
+				<input type="text" name="searchCompanyName" value="${searchCompanyName!}"/>
+			</li>
+			<#if type == 0>
+			<li>
+			<label><@s.m "${orderType}.order.status"/>：</label>
+			<select id="statusSelect" class="combox" name="searchStatus">
+				<option value="">所有状态</option>
+				<option value="0"><@s.m "${orderType}.order.status.0"/></option>
+				<option value="1"><@s.m "${orderType}.order.status.1"/></option>
+				<option value="2"><@s.m "${orderType}.order.status.2"/></option>
+				<option value="3"><@s.m "${orderType}.order.status.3"/></option>
+			</select>
+			</li>
+			</#if>
+		</ul>
+		<div class="subBar">
+			<ul>
+				<li><div class="buttonActive"><div class="buttonContent"><button type="submit"><@s.m "global.query"/></button></div></div></li>
+			</ul>
+		</div>
+	</div>
+	</form>
+</div>
+<div class="pageContent">
+	<div class="panelBar">
+		<ul class="toolBar">
+		<#if type == 0>
+			<@berp_perm url="/o_${orderType}_order"><li><a class="add" href="v_${orderType}_order_add.do" target="navTab" rel="main"><span><@s.m "${orderType}.order.add"/></span></a></li></@berp_perm>
+		</#if>
+		</ul>
+	</div>
+	<table class="table" width="100%" layoutH="138">
+		<thead>
+			<tr>
+				<th width="20"><@s.m "global.id"/></th>
+				<th width="60"><@s.m "${orderType}.order"/></th>
+				<th width="100"><@s.m "${orderType}.order.details"/></th>
+				<th width="20"><@s.m "${orderType}.order.company"/></th>
+				<th width="80"><@s.m "${orderType}.order.time"/></th>
+				
+				<#if '${orderType}' == 'sell' && type == 0>
+				<th width="80"><@s.m "purchase.order.details"/></th>
+				<th width="80"><@s.m "plan.details"/></th>
+				</#if>
+				
+				<th width="30"><@s.m "${orderType}.order.status"/></th>
+				<th width="15"><@s.m "global.createUser"/></th>
+				<th width="60"><@s.m "global.operate"/></th>
+			</tr>
+		</thead>
+		<tbody>
+			<#list pagination.list as order>
+			<tr target="sid_user" rel="1">
+				<td>${order.id}</td>
+				
+				<td>${order.display!}</td>
+				<td>
+					<#list order.records as record>
+					<span style="width:130px;display:inline-block;overflow:hidden;line-height:21px;margin-right:12px;">${record.material.nameSpec!}</span><span style="display:inline-block;overflow:hidden;line-height:21px;">${record.number} / ${record.finishNumber!} ${record.material.unit}</span><br>
+					</#list>
+				</td>
+				<td>${order.company.name!}</td>
+				<td>${(order.billTime?string('yyyy-MM-dd'))!}</td>
+				
+				<#if '${orderType}'=='sell' && type == 0>
+				<td>
+				<!-- 审核后的才能采购，那么如果弃核要考虑下是否有采购的todo -->
+					<#list order.records as record>
+						<#if record.purchaseRecords??>
+							<#list record.purchaseRecords as pRecord>
+							<#if pRecord.status gt 0>
+							<span style="width:70px;display:inline-block;overflow:hidden;line-height:21px;margin-right:12px;">${pRecord.material.nameSpec!}</span><span style="display:inline-block;overflow:hidden;line-height:21px;">${pRecord.number} / ${pRecord.finishNumber!} ${pRecord.material.unit}</span><br>
+							</#if>
+							</#list>
+						</#if>
+					</#list>
+					<#if order.status gt 0 && order.status lt 3>
+					<@berp_perm url="/o_purchase_order"><a href="v_record_material_multi_list.do?orderId=${order.id}" target="dialog" rel="dialog_purchase_order_todo_select" title="<@s.m 'purchase.order.todo.select'/>" mask="true"><@s.m "purchase.order.todo.add"/></a></@berp_perm>
+					</#if>
+				</td>
+				<td>
+					<#list order.records as record>
+						<#list record.plans as plan>
+						<#if plan.status gt 0>
+						<span style="width:80px;display:inline-block;overflow:hidden;line-height:21px;margin-right:12px;">${plan.material.nameSpec!}</span><span style="display:inline-block;overflow:hidden;line-height:21px;">${(plan.rawBatchFlow.number)!plan.number} / ${plan.packageNumber!}</span><br>
+						</#if>
+						</#list>
+					</#list>
+					<#if order.status gt 0 && order.status lt 3>
+					<@berp_perm url="/o_plan"><a href="v_record_multi_list.do?type=0&orderId=${order.id!}" target="dialog" rel="dialog_plan_todo_select" mask="true" title="<@s.m 'sell.order.selectProduct'/>"><@s.m "plan.todo.add"/></a></@berp_perm>
+					</#if>
+				</td>
+				</#if>
+				
+				<td<#if order.status==0> style="color:red"</#if>><@s.m "${orderType}.order.status.${order.status}"/></td>
+				<td>${(order.createUser.name)!}</td>
+				<#if type?? && type==1>
+					<td><a class="btnSelect" href="javascript:$.bringBack({'serial':'${order.serial!}', 'name':'${order.name!}', 'info':'${order.info}',  'id':'${order.id}'})"><@s.m "global.select"/></a></td>
+				<#else>
+				<td>
+					<a title="<@s.m '${orderType}.order.view'/>" target="navTab" href="v_${orderType}_order_view.do?orderId=${order.id}" rel="main"><@s.m "global.view"/></a>
+					<@berp_perm url="/o_${orderType}_order"><a title="<@s.m '${orderType}.order.edit'/>" target="navTab" href="v_${orderType}_order_edit.do?orderId=${order.id}" rel="main"><@s.m "global.edit"/></a>
+					<a title="<@s.m 'global.confirm.delete'/>" target="ajaxTodo" href="o_${orderType}_order_delete.do?orderId=${order.id}" rel="main"><@s.m "global.delete"/></a></@berp_perm>
+				</td>
+				</#if>
+			</tr>
+			</#list>
+		</tbody>
+	</table>
+	<div class="panelBar">
+		<div class="pages"><span>每页显示${pagination.pageSize!}条，共${pagination.totalCount!}条</span></div>
+		<div class="pagination" targetType="<#if type gt 0>dialog<#else>navTab</#if>" totalCount="${pagination.totalCount!}" numPerPage="${pagination.pageSize!}" pageNumShown="10" currentPage="${pagination.pageNo!}"></div>
+	</div>
+</div>

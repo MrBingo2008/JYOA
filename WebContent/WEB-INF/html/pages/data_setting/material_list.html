@@ -1,0 +1,99 @@
+<script type="text/javascript">
+$(function(){
+	//2018-4-26，如果之前打开过sidebarH，重新加载时需要隐藏
+	closeH();
+	
+	if ($.fn.jBarH) {
+		$("#listDetailContain").jBarH({minW:150, maxW:700});
+	}
+});
+</script>
+<form id="pagerForm" method="post" onsubmit="return divSearch(this, 'jbsxBox');" action="v_material_list.do?type=${type}">
+	<input type="hidden" name="pageNum" value="${pagination.pageNo!}" />
+	<input type="hidden" name="numPerPage" value="${pagination.pageSize!}" />
+	<input type="hidden" name="parentId" value="${parentId!}" />
+	<input type="hidden" name="searchName" value="${searchName!}"/>
+</form>
+
+<div class="pageHeader" style="border:1px #B8D0D6 solid">
+	<form onsubmit="return divSearch(this, 'jbsxBox');" action="v_material_list.do?type=${type}" method="post">
+	<div class="searchBar">
+		<table class="searchContent">
+			<tr>
+				<td>
+					<label><@s.m "material.serialOrName"/>：</label><input type="text" name="searchName" value="${searchName!}"/>
+				</td>
+				<td><div class="buttonActive"><div class="buttonContent"><button type="submit"><@s.m "global.query"/></button></div></div></td>
+			</tr>
+		</table>
+	</div>
+	</form>
+</div>
+
+<div class="pageContent" style="border-left:1px #B8D0D6 solid;border-right:1px #B8D0D6 solid;border-bottom:1px #B8D0D6 solid">
+	<div class="panelBar">
+		<ul class="toolBar">
+		<!-- 因为addEnable很多地方都需要标明，所以用addDisable，而disable又不好判断非，所以只能判断是 -->
+		<!-- 	<@berp_perm url="/o_material"><#if type??><li><a class="add" href="v_material_add.do?type=${type!}"<#if type gt 0>target="dialog" mask="true" width="980" height="600" rel="material_add_dialog"<#else>target="navTab" rel="main"</#if>><span><@s.m "material.add"/></span></a></li></#if></@berp_perm>  -->
+		<@berp_perm url="/o_material"><#if type == 0><li><a class="add" href="v_material_add.do?type=${type!}" target="navTab" rel="main"><span><@s.m "material.add"/></span></a></li></#if></@berp_perm>
+		</ul>
+	</div>
+	<table class="table" width="100%" layoutH="119" rel="jbsxBox">
+		<thead>
+			<tr>
+				<th width="30"><@s.m "global.id"/></th>
+				<th width="40"><@s.m "material.allSerial"/></th>
+				<th width="40"><@s.m "material.nameSpec"/></th>
+				<th width="40"><@s.m "material.category"/></th>
+				<th width="40"><@s.m "material.leftNumber"/></th>
+				<th width="40"><@s.m "purchase.order.notFinishNumber"/></th>
+				<th width="40"><@s.m "sell.order.notFinishNumber"/></th>
+				<th width="30"><@s.m "step.surface"/></th>
+				<th width="40"><@s.m "material.assemblies"/></th>
+				<th width="20"><@s.m "material.attachs"/></th>
+				<th width="20"><@s.m "material.unit"/></th>
+				<th width="60"><@s.m "global.operate"/></th>				
+			</tr>
+		</thead>
+		<tbody>
+		<#list pagination.list as m>
+			<tr target="sid_obj" rel="1">
+			    <td>${m.id}</td>
+			    <td>${m.allSerial!}</td>
+				<td>${m.nameSpec!}</td>
+				<td>${m.parent.fullname}</td>
+				<td>${m.leftNumber!}</td>
+				<td>${m.notPurchaseInNumber!}</td>
+				<td>${m.notSellOutNumber!}</td>
+				<td>${(m.surface.name)!}</td>
+				<td>${m.assembliesString!}</td>
+				<td><#if m.attachs?? && m.attachs?size gt 0><@s.m 'global.true'/></#if></td>
+				<td>${m.unit!}</td>
+				<!-- type换成0为管理的list， 大于0为选择模式 -->
+				<#if type == 0>			
+					<td>
+					<@berp_perm url="/v_material"><a title="<@s.m 'material.view'/>" target="navTab" href="v_material_view.do?materialId=${m.id}" rel="main"><@s.m "global.view"/></a></@berp_perm>
+					<@berp_perm url="/o_material"><a title="<@s.m 'material.edit'/>" target="navTab" href="v_material_edit.do?materialId=${m.id}" rel="main"><@s.m "global.edit"/></a>
+					<a title="<@s.m 'global.confirm.delete'/>" target="ajaxTodo" href="o_material_delete.do?materialId=${m.id}"><@s.m "global.delete"/></a></@berp_perm>
+					</td>
+				<#elseif type == 1>
+					<td><a class="btnSelect" href="javascript:$.bringBack({'material.serial':'${m.allSerial!}', 'material.name':'${m.name!}', 'material.nameSpec':'${m.nameSpec!}', numPerBox:'${m.numPerBox!}', 'material.unit':'${m.unit!}', 'material.id':'${m.id}', 'material.category':'${m.parent.name!}', 'surface.id':'${(m.surface.id)!}', 'surface.name':'${(m.surface.name)!}', ':company.id':'${(m.company.id)!}' , ':company.name':'${(m.company.name)!}' })"><@s.m "global.select"/></a></td>
+				<#elseif type == 11>
+				<!-- stone：在 type = 1的基础上，去掉company，为了原材料组成设计的，因为它不需要自动填写company -->
+					<td><a class="btnSelect" href="javascript:$.bringBack({'material.serial':'${m.allSerial!}', 'material.name':'${m.name!}', 'material.nameSpec':'${m.nameSpec!}', numPerBox:'${m.numPerBox!}', 'material.unit':'${m.unit!}', 'material.id':'${m.id}', 'material.category':'${m.parent.name!}', 'surface.id':'${(m.surface.id)!}', 'surface.name':'${(m.surface.name)!}' })"><@s.m "global.select"/></a></td>
+				<#elseif type == 2>
+					<td><a href="v_batch_list.do?materialId=${m.id}&type=1" onclick="openBatchDetail()" target="ajax" rel="sidebarContentH"><@s.m "material.showBatch"/></a></td>
+				<#elseif type == 3>
+					<td><a href="v_batch_list.do?materialId=${m.id}&type=2" onclick="openBatchDetail()" target="ajax" rel="sidebarContentH"><@s.m "material.showBatch"/></a></td>
+				<#elseif type == 4>
+					<td><a href="v_batch_list.do?materialId=${m.id}&type=0" title="<@s.m 'material.detail'/>" width="800" height="600" target="dialog" mask="true"><@s.m "material.showDetail"/></a></td>
+				</#if>
+			</tr>
+		</#list>
+		</tbody>
+	</table>
+	<div class="panelBar">
+		<div class="pages"><span>每页显示${pagination.pageSize!}条，共${pagination.totalCount!}条</span></div>
+		<div class="pagination" rel="jbsxBox" targetType="<#if type == 0 || type == 4>navTab<#else>dialog</#if>" totalCount="${pagination.totalCount!}" numPerPage="${pagination.pageSize!}" pageNumShown="10" currentPage="${pagination.pageNo!}"></div>
+	</div>
+</div>

@@ -1,0 +1,96 @@
+<!-- 差不多可以考虑把这个删除 -->
+<form id="pagerForm" method="post" onsubmit="return dwzSearch(this, 'dialog');" action="v_record_list.do?direction=${direction!}">
+	<input type="hidden" name="pageNum" value="${pagination.pageNo!}" />
+	<input type="hidden" name="numPerPage" value="${pagination.pageSize!}" />
+	<input type="hidden" name="searchName" value="${searchName!}"/>
+</form>
+<div id="recordContain">
+<div class="unitBox">
+	<div class="pageHeader" style="border:1px #B8D0D6 solid">
+		<form onsubmit="return dwzSearch(this, 'dialog');" action="v_record_list.do?direction=${direction!}" method="post">
+		<div class="searchBar">
+			<table class="searchContent">
+				<tr>
+					<td>
+						<label><@s.m "orderOrMaterial"/>：</label><input type="text" name="searchName" value="${searchName!}"/>
+					</td>
+					<td><div class="buttonActive"><div class="buttonContent"><button type="submit"><@s.m "global.query"/></button></div></div></td>
+				</tr>
+			</table>
+		</div>
+		</form>
+	</div>
+	
+	<div class="pageContent" style="border-left:1px #B8D0D6 solid;border-right:1px #B8D0D6 solid;border-bottom:1px #B8D0D6 solid">
+		<table class="table" width="99%" layoutH="106">
+			<thead>
+				<tr>
+					<th width="40">ID</th>
+					<th width="100" orderField="number" class="asc"><@s.m "material.allSerial"/></th>
+					<th width="100"><@s.m "material.name"/></th>
+					<#if direction != 1>
+						<th width="60"><@s.m "sell.order.surface"/></th>
+					</#if>
+					<th width="80"><@s.m "${orderType}.order.company"/></th>
+					<th width="140"><@s.m "${orderType}.order.serial"/></th>
+					<th width="100"><@s.m "${orderType}.order.number"/></th>
+					<th width="100"><@s.m "${orderType}.order.notFinishNumber"/></th>
+					<th width="40"><@s.m "material.unit"/></th>
+					<th width="60"><@s.m "global.operate"/></th>				
+				</tr>
+			</thead>
+			<tbody>
+			<#list pagination.list as record>
+				<tr target="sid_obj" rel="1">
+				    <td>${record.id}</td>
+					<td>${record.material.allSerial!}</td>
+					<td>${record.material.nameSpec!}</td>
+					<#if direction != 1>
+						<td>${(record.surface.name)!}</td>
+					</#if>
+					<td>${record.ord.company.name!}</td>
+					<td>${record.ord.serial!}</td>
+					<td>${record.number!}</td>
+					<td>${record.notFinishNumber!}</td>
+					<td>${record.material.unit!}</td>		
+					<td>
+					<#if direction == 2>
+						<a href="v_batch_list.do?materialId=${record.material.id}&recordId=${record.id}" onclick="openBatchDetail();" target="ajax" rel="sidebarContentH"><@s.m "material.showBatch"/></a>
+					<#else>
+						<!-- 因为在plan里，既要返回material，也要返回record，所以lookupGroup直接为空，在返回的名称里直接命名，如record.id -->
+						<!-- 返回number，可以满足(plan)number和(cir).flows[].number -->
+						<#assign boxNum = "" />
+						<#if record.material.numPerBox?? && record.material.numPerBox != 0><#assign boxNum = record.notFinishNumber / record.material.numPerBox /></#if>
+						<a class="btnSelect" href="javascript:$.bringBack({'material.id':'${record.material.id}', 'material.serial':'${record.material.allSerial!}', 'material.nameSpec':'${record.material.nameSpec!}', numPerBox:'${record.material.numPerBox!}', 'material.unit':'${record.material.unit!}', ':company.id':'${(record.material.company.id)!}' , ':company.name':'${(record.material.company.name)!}', 
+						 'record.order.info':'${record.ord.info!}', 'record.orderSerial': '${record.ord.info!}', 'record.id':'${record.id}', 'record.number':'${record.number!}' , number:'${record.notFinishNumber!}', boxNum: '${boxNum}', 'record.surface.name':'${(record.surface.name)!}', 'record.id':'${record.id}'})"><@s.m "global.select"/></a>
+					</#if>
+					</td>
+				</tr>
+			</#list>
+			</tbody>
+		</table>
+		<div class="panelBar">
+		<div class="pages"><span>每页显示${pagination.pageSize!}条，共${pagination.totalCount!}条</span></div>
+		<div class="pagination" targetType="dialog" totalCount="${pagination.totalCount!}" numPerPage="${pagination.pageSize!}" pageNumShown="10" currentPage="${pagination.pageNo!}"></div>
+	</div>
+	</div>
+</div>
+<div id="sidebarH" style="height:0px; display:none">
+	<div class="sidebarHeader">
+		<div class="sidebarHeaderContent">
+			<h1 style="">物料批次</h1>
+			<a class="icon-button close"></a>
+		</div>
+	</div>
+	<div id="sidebarContentH" class="sidebarContentH" style="height: 155px">
+	</div>
+</div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+	if ($.fn.jBarH) {
+		$("#recordContain").jBarH({minW:150, maxW:700});
+	}
+});
+</script>

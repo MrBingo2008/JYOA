@@ -1,0 +1,50 @@
+<script type="text/javascript">
+$(function(){	
+	if('${openMode!}' == 'edit'){
+		var actionUrl = "o_company_update.do";
+		$("form").attr("action", actionUrl);
+	}
+});
+</script>
+
+<div class="pageContent">
+	<form method="post" action="o_company_save.do" class="pageForm required-validate" onsubmit="return validateCallback(this, <#if type?? && type gt 0>dialogAjaxDone<#else>navTabAjaxDone</#if>);">
+		<div class="pageFormContent" layoutH="56">
+		<input type="hidden" name = "type" value="${type!}" />
+			<p>
+				<label>ID:</label>
+				<input name="id" type="text" size="20" value="${company.id!}" readonly="readonly"/>
+			</p>
+			<p>
+				<label><@s.m "company.name" />:</label>
+				<input name="name" value="${company.name!}" class="required" type="text"/>
+			</p>
+			<p>
+				<label><@s.m "category.2.parent"/>:</label>
+				<input type="hidden" name="parent.id" value="${(company.parent.id)!}"/>
+				<input type="text" class="required" name="parent.name" value="${(company.parent.name)!}" readonly/>
+				<a class="btnLook" width="250" height="350" href="v_category_tree.do?parentId=2" lookupGroup="parent" rel="company_category_dialog"><@s.m "category.2.parent"/></a>		
+			</p>
+			<p>
+				<label><@s.m "company.tel"/>:</label>
+				<input name="tel" value="${company.tel!}" type="text" size="20"/>
+			</p>
+			<p>
+				<label><@s.m "company.address"/>:</label>
+				<input name="address" value="${company.address!}" type="text" size="20"/>
+			</p>
+		</div>
+		<div class="formBar">
+			<ul>
+				<li><div class="buttonActive"><div class="buttonContent"><button type="submit">保存</button></div></div></li>
+				<li><div class="button"><div class="buttonContent">
+					<#if type?? && type == 1>
+					<button type="button" class="close">取消</button>
+					<#else>
+					<a href="v_company.do?type=0" target="navTab" rel="main"><button type="button">取消</button></a>
+					</#if>
+				</div></div></li>
+			</ul>
+		</div>
+	</form>
+</div>

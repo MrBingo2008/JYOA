@@ -1,0 +1,69 @@
+<style type="text/css">
+	ul.rightTools {float:right; display:block;}
+	ul.rightTools li{float:left; display:block; margin-left:5px}
+</style>
+
+<script type="text/javascript">
+
+function getMaterialCategoryTree(data){   
+    var tree = "";
+    var selectClass = "";
+    if(data.id=='${parentId!}')
+    	selectClass = "class='selected'";
+    //这里不需要useSession吗
+    tree += "<li " +selectClass+ "><a href='v_material_list.do?type=${type}&parentId="+data.id+"' target='ajax' rel='jbsxBox'>"+data.name+"</a>";   
+    if(data.hasOwnProperty("children")){
+    	tree += "<ul>";
+    	var childrenVal = eval(data.children);
+    	for(var i=0; i<childrenVal.length; i++){
+    		tree += getMaterialCategoryTree(childrenVal[i]);
+    	}
+    	tree += "</ul>";
+    }
+    tree += "</li>";    
+    return tree;   
+}
+
+$(function(){	
+	var data = ${tree};
+	$("#leftMaterialCategoryTree").html(getMaterialCategoryTree(data));
+	//left_bar那里有用到，但用的是:first
+	setTimeout(function () {
+		//$("#leftMaterialCategoryTree a").first().trigger("click");
+		$("#jbsxBox").loadUrl("v_material_list.do?type=${type!}&parentId=${parentId!}&useSession=${useSession!}", {}, function(){
+			//异步获取后，不会自动计算layoutH的高度
+			$("#jbsxBox").find("[layoutH]").layoutH();
+		});
+		}, 200);
+});
+</script>
+
+<!-- <h2 class="contentTitle">物料管理</h2>  -->
+
+<div class="pageContent" style="padding:2px; margin:0px;height:100%;">
+	<!-- 这个layoutH是靠人工调出来的，和material_list那个table一样 -->
+	<div layoutH="5"
+		style="float: left; display: block; overflow: auto; width: 160px; border: solid 1px #CCC; line-height: 21px; background: #fff">
+		<ul id="leftMaterialCategoryTree" class="tree treeFolder">
+		</ul>
+	</div>
+
+	<div id="listDetailContain" style="margin-left:166px;">
+		<div id="jbsxBox" class="unitBox">
+		</div>
+		<div id="sidebarH" style="height:0px; display:none">
+			<div class="sidebarHeader">
+				<div class="sidebarHeaderContent">
+					<h1 style="">物料批次</h1>
+					<a class="icon-button close"></a>
+				</div>
+			</div>
+			<div id="sidebarContentH" class="sidebarContentH" style="height: 155px">
+			</div>
+		</div>
+	</div>
+</div>
+
+
+	
+

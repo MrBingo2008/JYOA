@@ -1,0 +1,31 @@
+<div id="left_bar_doc" class="accordion" fillSpace="sideBar">
+	
+	<@berp_perm url="/v_doc_prepare">
+	<div class="accordionHeader">
+		<h2><span>Folder</span><@s.m "doc.prepare"/></h2>
+	</div>
+	<div class="accordionContent">
+		<ul class="tree treeFolder">
+			<@berp_perm url="/v_doc_prepare"><li><a href="v_doc_prepare_list.do" target="navTab" rel="main"><@s.m "doc.prepare.list"/></a></li></@berp_perm>
+			<@berp_perm url="/o_doc_prepare"><li><a href="v_doc_prepare_add.do" target="navTab" rel="main"><@s.m "doc.prepare.add"/></a></li></@berp_perm>
+		</ul>
+	</div>
+	</@berp_perm>
+	
+	<@berp_perm url="/v_doc_approval">
+	<div class="accordionHeader">
+		<h2><span>Folder</span><@s.m "doc.approval"/></h2>
+	</div>
+	<div class="accordionContent">
+		<ul class="tree treeFolder">
+			<@berp_perm url="/v_checkOut"><li><a href="v_doc_approval_list.do" target="navTab" rel="main"><@s.m "doc.approval.list"/></a></li></@berp_perm>
+		</ul>
+	</div>
+	</@berp_perm>
+		
+	<script type="text/javascript">
+	$(function(){
+		//setTimeout(function() {$("#left_bar_doc a:first").trigger("click");}, 300);
+	});
+	</script>
+</div>

@@ -1,0 +1,43 @@
+
+<div class="pageContent">
+	<table class="table" width="100%" layoutH="54">
+		<thead>
+			<tr>
+				<th width="30"><@s.m "rawMaterial"/></th>
+				<th width="10"><@s.m "material.number"/></th>
+				<th width="50"><@s.m "sell.order.forProduct"/></th>
+			</tr>
+		</thead>
+		<tbody>
+			<#if mrps??>
+			<#list mrps as mrp>
+			<tr>
+				<td>${mrp.materialInfo!}</td>
+				<td>${mrp.materialNumber!}</td> 
+				<td>${mrp.recordInfo!}</td>
+			</tr>
+			</#list>
+			</#if>
+		</tbody>
+	</table>
+</div>
+<div class="formBar">
+	<ul>
+	<!-- 如果<a>放在<button>里面，ie8居然点击不了 -->
+		<li><div class="button"><div class="buttonContent"><a href="v_purchase_order_todo_list.do" target="dialog" rel="dialog_purchase_order_todo_list" title="<@s.m 'purchase.order.todo.list'/>"><button type="button"><@s.m "purchase.order.todo.clear"/></button></a></div></div></li>
+		<li><div class="button"><div class="buttonContent"><a id="purchaseOrderGen" href=""><button type="button"><@s.m "purchase.order.todo.gen"/></button></a></div></div></li>
+	</ul>
+</div>
+<script type="text/javascript">
+function clearPurchaseTodo() {
+	ajaxTodo("o_purchase_order_todo_clear.do");
+	return true;
+}
+$(function(){
+	$("#purchaseOrderGen").click(function(event){
+		$.pdialog.close("dialog_purchase_order_todo_list");
+		navTab.openTab("main", "v_purchase_order_todo_gen.do",{title:"<@s.m 'purchase.order.add'/>", fresh:true, external:false});
+		event.preventDefault();
+	});
+});
+</script>

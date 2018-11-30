@@ -1,0 +1,129 @@
+<div id="recordMaterialContain">
+<div class="unitBox">
+	<form id="pagerForm" method="post" onsubmit="return divSearch(this, 'recordContain');" action="v_record_material_multi_list.do">
+		<input type="hidden" name="searchName" value="${searchName!}"/>
+	</form>
+	<div class="pageHeader" style="border:1px #B8D0D6 solid">
+		<form onsubmit="return divSearch(this, 'recordContain');" action="v_record_material_multi_list.do" method="post">
+		<div class="searchBar">
+			<table class="searchContent">
+				<tr>
+					<td><@s.m "sell.order"/>: ${order.info!}</td>
+					<td><div class="button"><div class="buttonContent"><button id="testButton" type="button" onclick="closeAndSelect();"><@s.m "global.confirm"/></button></div></td>
+				</tr>
+				<tr>
+					<td><@s.m "rawMaterial"/>：<span style="color:#E36C0A">产品-橙色</span><span style="margin-left:8px;">原材料-黑色</span></td>
+				</tr>
+			</table>
+		</div>
+		</form>
+	</div>
+	
+	<div class="pageContent" style="border-left:1px #B8D0D6 solid;border-right:1px #B8D0D6 solid;border-bottom:1px #B8D0D6 solid">
+		<table class="table" width="99%" layoutH="106">
+			<thead>
+				<tr>
+					<th width="30"><input type="checkbox" class="checkboxCtrl" group="checkboxIds" /></th>
+					<th width="100" orderField="number" class="asc"><@s.m "rawMaterial"/></th>
+					<th width="100"><@s.m "material.number"/></th>
+					<th width="40"><@s.m "material.unit"/></th>
+					<th width="100"><@s.m "sell.order.forProduct"/></th>	
+					<th width="100"><@s.m "sell.order.notFinishNumber"/></th>
+					<th width="40"><@s.m "material.unit"/></th>			
+				</tr>
+			</thead>
+			<tbody>
+			<#if order.records??>
+			<#list order.records as record>
+				<tr>
+					<td><input type="checkbox" name="checkboxIds" value="{'materialId':'${record.material.id}','recordId':'${record.id}', number:${record.notFinishNumber}}"/></td>
+					<td><span style="color:#E36C0A">${record.material.nameSpec!}</span></td>
+					<td>${record.notFinishNumber!}</td>
+					<td>${record.material.unit!}</td>
+					<td>${record.material.nameSpec!}</td>
+					<td>${record.notFinishNumber!}</td>
+					<td>${record.material.unit!}</td>
+				</tr>
+				
+				<#if record.material.assemblies??>
+				<#list record.material.assemblies as assembly>
+				<tr target="sid_obj" rel="1">
+					<#assign needNumber = 0 />
+					<#if assembly.materialNumber?? && assembly.materialNumber != 0>
+						<#assign needNumber = record.notFinishNumber * assembly.materialNumber / assembly.productNumber  />
+					</#if> 
+					<!-- 这个是不需要bringback的，直接在本页面的js处理 -->
+				    <td><input type="checkbox" name="checkboxIds" value="{'materialId':'${assembly.material.id}','recordId':'${record.id}', number:${needNumber}}"/></td>
+					<td>${assembly.material.nameSpec!}</td>
+					<td>${needNumber!}</td>
+					<td>${assembly.material.unit!}</td>
+					<td>${record.material.nameSpec!}</td>
+					<td>${record.notFinishNumber!}</td>
+					<td>${record.material.unit!}</td>
+				</tr>
+				</#list>
+				</#if>
+
+			</#list>
+			</#if>
+			</tbody>
+		</table>
+	</div>
+</div>
+<div id="sidebarH" style="height:0px; display:none">
+	<div class="sidebarHeader">
+		<div class="sidebarHeaderContent">
+			<h1 style="">物料批次</h1>
+			<a class="icon-button close"></a>
+		</div>
+	</div>
+	<div id="sidebarContentH" class="sidebarContentH" style="height: 155px">
+	</div>
+</div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+	if ($.fn.jBarH) {
+		$("#recordMaterialContain").jBarH({minW:150, maxW:700});
+	}
+});
+
+function test(){
+	openBatchDetail();
+	setTimeout(function() {
+		$(".sidebarHeader").css("padding", "0px");
+		$("#sidebarContentH").css("padding", "0px");}, 20);
+}
+
+function closeAndSelect(){
+	var materialIdString = "", recordIdString = "", numberString;
+	//var $unitBox = $this.parents(".unitBox:first");
+	var $unitBox = $("#testButton").parents(".unitBox:first");
+	$unitBox.find("[name='checkboxIds']").filter(":checked").each(function(){
+		var _args = DWZ.jsonEval($(this).val());
+		for (var key in _args) {
+			//modified by stone,写死了
+			if(key == "materialId"){
+				var temp = materialIdString ? materialIdString+"," : "";
+				materialIdString = temp + _args[key];
+			}else if(key =="recordId"){
+				var temp = recordIdString ? recordIdString+"," : "";
+				recordIdString = temp + _args[key];
+			}else if(key =="number"){
+				var temp = numberString ? numberString+"," : "";
+				numberString = temp + _args[key];
+			}
+		}
+	});
+
+	if (materialIdString == null || materialIdString == "") {
+		alertMsg.error("请选择原材料");
+		return false;
+	}
+	
+	$.pdialog.close("dialog_purchase_order_todo_select");
+	$.pdialog.open("v_purchase_order_todo_list.do?materialIdString="+materialIdString+"&recordIdString="+recordIdString+"&numberString="+numberString, "dialog_purchase_order_todo_list", "<@s.m 'purchase.order.todo.list'/>", {width:300, height:200, align:"bottomLeft", close:"function(){ajaxTodo('o_purchase_order_todo_clear.do');}"});
+	
+}
+</script>

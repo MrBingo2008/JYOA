@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.berp.mrp.entity">
+	<class name="MaterialAttach" table="material_attach">
+		<id name="id" type="java.lang.Integer" column="id"><generator class="identity"/></id>
+		<property name="priority" column="priority" type="integer" length="10"/>
+		<property name="name" column="name" type="string" length="50"/>
+		<property name="url" column="url" type="string" length="255"/>
+		<property name="location" column="location" type="string" length="255"/>
+		<property name="src" column="src" type="string"/>
+		<property name="type" column="type" type="string" length="50"/>
+		<property name="size" column="size" type="java.lang.Double" length="10"/>
+		<many-to-one name="material" column="material_id" class="com.berp.mrp.entity.Material"/>
+	</class>
+</hibernate-mapping>
