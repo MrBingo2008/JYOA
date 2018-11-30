@@ -1,0 +1,20 @@
+https://blog.csdn.net/north1989/article/details/53471439?utm_source=itdadao&utm_medium=referral
+先在网页版新建一个reposity
+第一步：建立git仓库
+
+git init 
+
+第二步：将项目的所有文件添加到仓库中 
+
+git add . 
+
+第三步：将add的文件commit到仓库 
+
+git commit -m “first commit” 
+
+第四步：连接到远程仓库并为该仓库创建别名,别名为origin（这个别名是自定义的，通常用origin）
+git remote add origin https://github.com/xxxxx/IFE-2017.git 
+
+第五步：上传代码到github远程仓库 
+
+git push -u origin master
